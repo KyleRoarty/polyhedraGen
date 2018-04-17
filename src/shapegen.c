@@ -4,6 +4,15 @@
 
 #include "shapegen.h"
 
+int factorial(int from, int to){
+    int ret = 1;
+    for(int i = from; i > to; i--){
+        ret *= i;
+    }
+
+    return ret;
+}
+
 void CreatePoint(FILE *fp, point_3 *point){
     char *num, *saveptr;
     size_t len;
@@ -17,13 +26,14 @@ void CreatePoint(FILE *fp, point_3 *point){
     point->y = atof(strtok_r(NULL, ",", &saveptr));
     point->z = atof(saveptr);
 
-    //free(num);
 }
 
 int main(int argc, char **argv){
     FILE *fp;
     int num_p;
     point_3** point_arr;
+    seg_3** seg_arr;
+    triangle** tri_arr;
 
     if(argc != 3)
         exit(-1);
@@ -31,6 +41,13 @@ int main(int argc, char **argv){
     num_p = atoi(argv[1]);
 
     point_arr = malloc(num_p*sizeof(point_3 *));
+
+    //Line: nCr(num,2) = num!/(2!*(num-2)!) Or num*num-1/2
+    seg_arr = malloc((factorial(num_p, num_p-2)/2)*sizeof(seg_3 *));
+
+    //Triangles: nCr(num, 3) = num!/(3!*(num-3)!) or num*num-1*num-2/6
+    tri_arr = malloc((factorial(num_p, num_p-3)/6)*sizeof(triangle *));
+
     fp = fopen(argv[2], "r");
 
 
@@ -40,9 +57,6 @@ int main(int argc, char **argv){
         printf("%f, %f, %f\n", point_arr[i]->x, point_arr[i]->y, point_arr[i]->z);
     }
 
-    /*for(int i = 0; i < num_p; i++){
-        printf("%f, %f, %f\n", point_arr[i]->x, point_arr[i]->y, point_arr[i]->z);
-    }*/
 
     return 0;
 
