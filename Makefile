@@ -1,4 +1,4 @@
-CFLAGS= -g -Wall -O3 -std=gnu11
+CFLAGS= -g -Wall -std=gnu11
 LDLIBS=
 LDFLAGS=
 CC=gcc
@@ -9,3 +9,6 @@ BIN=./bin
 
 $(BIN)/$(P): $(SRC)/$(P).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@
+
+clean:
+	rm $(BIN)/*
