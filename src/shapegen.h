@@ -9,17 +9,18 @@ typedef struct {
 
 
 typedef struct {
-    point_3 start;
-    point_3 end;
+    point_3 *start;
+    point_3 *end;
 } seg_3;
 
 typedef struct {
-    point_3 a;
-    point_3 b;
-    point_3 c;
-    seg_3 ab;
-    seg_3 ac;
-    seg_3 bc;
+    point_3 *p[3];
+    seg_3 s[3];
 } triangle;
 
+typedef struct {
+    triangle *t1;
+    triangle *t2;
+    seg_3 *shared;
+} overlap;
 #endif

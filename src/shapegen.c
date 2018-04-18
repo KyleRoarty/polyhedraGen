@@ -15,18 +15,24 @@ int factorial(int from, int to){
 
 void PrintTriangle(triangle *tri){
     printf("a: %f %f %f, b: %f %f %f, c: %f %f %f\n",
-            tri->a.x, tri->a.y, tri->a.z,
-            tri->b.x, tri->b.y, tri->b.z,
-            tri->c.x, tri->c.y, tri->c.z);
+            tri->p[1]->x, tri->p[1]->y, tri->p[1]->z,
+            tri->p[2]->x, tri->p[2]->y, tri->p[2]->z,
+            tri->p[3]->x, tri->p[3]->y, tri->p[3]->z);
 }
 
-void CreateTriangle(triangle *tri, point_3 a, point_3 b, point_3 c){
-    tri->a = a;
-    tri->b = b;
-    tri->c = c;
-    tri->ab = (seg_3){a, b};
-    tri->ac = (seg_3){a, c};
-    tri->bc = (seg_3){b, c};
+int DoesOverlap(triangle *t1, triangle *t2, overlap *ol){
+    // Returns an overlap in ol if the triangles overlap
+    return 0;
+
+}
+
+void CreateTriangle(triangle *tri, point_3 *a, point_3 *b, point_3 *c){
+    tri->p[1] = a;
+    tri->p[2] = b;
+    tri->p[3] = c;
+    tri->s[1] = (seg_3){a, b};
+    tri->s[2] = (seg_3){a, c};
+    tri->s[3] = (seg_3){b, c};
 }
 
 void CreatePoint(FILE *fp, point_3 *point){
@@ -78,8 +84,8 @@ int main(int argc, char **argv){
     for(int i = 0; i < num_p; i++){
         for(int j = i+1; j < num_p; j++){
             seg_arr[iter] = malloc(sizeof(seg_3));
-            seg_arr[iter]->start = *point_arr[i];
-            seg_arr[iter]->end = *point_arr[j];
+            seg_arr[iter]->start = point_arr[i];
+            seg_arr[iter]->end = point_arr[j];
 
             iter++;
         }
@@ -90,7 +96,7 @@ int main(int argc, char **argv){
         for(int j = i+1; j < num_p; j++){
             for(int k = j+1; k < num_p; k++){
                 tri_arr[iter] = malloc(sizeof(triangle));
-                CreateTriangle(tri_arr[iter], *point_arr[i], *point_arr[j], *point_arr[k]);
+                CreateTriangle(tri_arr[iter], point_arr[i], point_arr[j], point_arr[k]);
 
                 iter++;
             }
