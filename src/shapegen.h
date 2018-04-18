@@ -15,7 +15,7 @@ typedef struct {
 
 typedef struct {
     point_3 *p[3];
-    seg_3 s[3];
+    seg_3 *s[3];
 } triangle;
 
 typedef struct {

@@ -4,20 +4,54 @@
 
 #include "shapegen.h"
 
+void PrintSeg(seg_3 *seg){
+    printf("%f %f %f / %f %f %f\n",
+            seg->start->x, seg->start->y, seg->start->z,
+            seg->end->x, seg->end->y, seg->end->z);
+}
+
+void PrintTriangle(triangle *tri){
+    printf("Points: a: %f %f %f, b: %f %f %f, c: %f %f %f\n",
+            tri->p[0]->x, tri->p[0]->y, tri->p[0]->z,
+            tri->p[1]->x, tri->p[1]->y, tri->p[1]->z,
+            tri->p[2]->x, tri->p[2]->y, tri->p[2]->z);
+
+    printf("Segs:\n");
+    PrintSeg(tri->s[0]);
+    PrintSeg(tri->s[1]);
+    PrintSeg(tri->s[2]);
+    printf("\n");
+}
+
+//[from, to)
 int factorial(int from, int to){
     int ret = 1;
-    for(int i = from; i > to; i--){
+    for(int i = from; i > to; i--)
         ret *= i;
-    }
 
     return ret;
 }
 
-void PrintTriangle(triangle *tri){
-    printf("a: %f %f %f, b: %f %f %f, c: %f %f %f\n",
-            tri->p[1]->x, tri->p[1]->y, tri->p[1]->z,
-            tri->p[2]->x, tri->p[2]->y, tri->p[2]->z,
-            tri->p[3]->x, tri->p[3]->y, tri->p[3]->z);
+
+//[from, to)
+int sum(int from, int to){
+    int ret = 0;
+    for(int i = from; i > to; i--)
+        ret += i;
+
+    return ret;
+}
+
+// x < y, sz = number of points
+// x, y: idx of points to define seg from
+int segFromI(int x, int y, int sz){
+    return x*sz-sum(x, 0)+y-(x+1);
+}
+
+// x < y < z, sz = number of points
+// x, y, z: idx of points to define tri from
+int triFromI(int x, int y, int z, int sz){
+    return 0;
 }
 
 int DoesOverlap(triangle *t1, triangle *t2, overlap *ol){
@@ -26,13 +60,13 @@ int DoesOverlap(triangle *t1, triangle *t2, overlap *ol){
 
 }
 
-void CreateTriangle(triangle *tri, point_3 *a, point_3 *b, point_3 *c){
-    tri->p[1] = a;
-    tri->p[2] = b;
-    tri->p[3] = c;
-    tri->s[1] = (seg_3){a, b};
-    tri->s[2] = (seg_3){a, c};
-    tri->s[3] = (seg_3){b, c};
+void CreateTriangle(triangle *tri, point_3 **points, seg_3 **segs, int i, int j, int k, int num_p){
+    tri->p[0] = points[i];
+    tri->p[1] = points[j];
+    tri->p[2] = points[k];
+    tri->s[0] = segs[segFromI(i, j, num_p)];
+    tri->s[1] = segs[segFromI(i, k, num_p)];
+    tri->s[2] = segs[segFromI(j, k, num_p)];
 }
 
 void CreatePoint(FILE *fp, point_3 *point){
@@ -64,6 +98,7 @@ int main(int argc, char **argv){
     point_arr = malloc(num_p*sizeof(point_3 *));
 
     //Line: nCr(num,2) = num!/(2!*(num-2)!) Or num*num-1/2
+    //For n-5, = 5*4/2
     num_s = factorial(num_p, num_p-2)/2;
     seg_arr = malloc(num_s*sizeof(seg_3 *));
 
@@ -91,12 +126,17 @@ int main(int argc, char **argv){
         }
     }
 
+    for(int i = 0; i < num_s; i++){
+        printf("Segment %d\n", i);
+        PrintSeg(seg_arr[i]);
+    }
+
     iter = 0;
     for(int i = 0; i < num_p; i++){
         for(int j = i+1; j < num_p; j++){
             for(int k = j+1; k < num_p; k++){
                 tri_arr[iter] = malloc(sizeof(triangle));
-                CreateTriangle(tri_arr[iter], point_arr[i], point_arr[j], point_arr[k]);
+                CreateTriangle(tri_arr[iter], point_arr, seg_arr, i, j, k, num_p);
 
                 iter++;
             }
