@@ -5,9 +5,10 @@
 #include "shapegen.h"
 
 void PrintSeg(seg_3 *seg){
-    printf("%f %f %f / %f %f %f\n",
+    printf("S: %f %f %f E: %f %f %f Sl: %f %f %f\n",
             seg->start->x, seg->start->y, seg->start->z,
-            seg->end->x, seg->end->y, seg->end->z);
+            seg->end->x, seg->end->y, seg->end->z,
+            seg->slope->x, seg->slope->y, seg->slope->z);
 }
 
 void PrintTriangle(triangle *tri){
@@ -42,6 +43,16 @@ int sum(int from, int to){
     return ret;
 }
 
+
+// Calculates slope portion of seg_3 struct, puts it into seg->slope
+// Also allocates memory for seg->slope
+void slopeSeg(seg_3 *seg){
+    seg->slope = malloc(sizeof(point_3));
+    seg->slope->x = seg->end->x - seg->start->x;
+    seg->slope->y = seg->end->y - seg->start->y;
+    seg->slope->z = seg->end->z - seg->start->z;
+}
+
 // x < y, sz = number of points
 // x, y: idx of points to define seg from
 int segFromI(int x, int y, int sz){
@@ -54,8 +65,27 @@ int triFromI(int x, int y, int z, int sz){
     return 0;
 }
 
+// Returns an overlap in ol if the triangles overlap
+// Return 0 if no overlap, 1 if overlap
 int DoesOverlap(triangle *t1, triangle *t2, overlap *ol){
     // Returns an overlap in ol if the triangles overlap
+    int ol_t1 = -1;
+    int ol_t2;
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            if(t2->s[i] == t2->s[j]){
+                ol_t1 = i;
+                ol_t2 = j;
+                break;
+            }
+        }
+        if(ol_t1 != -1)
+            break;
+    }
+
+    if(ol_t1 == -1)
+        return 0;
+
     return 0;
 
 }
@@ -121,7 +151,7 @@ int main(int argc, char **argv){
             seg_arr[iter] = malloc(sizeof(seg_3));
             seg_arr[iter]->start = point_arr[i];
             seg_arr[iter]->end = point_arr[j];
-
+            slopeSeg(seg_arr[iter]);
             iter++;
         }
     }

@@ -11,6 +11,7 @@ typedef struct {
 typedef struct {
     point_3 *start;
     point_3 *end;
+    point_3 *slope;
 } seg_3;
 
 typedef struct {
