@@ -13,6 +13,22 @@ int factorial(int from, int to){
     return ret;
 }
 
+void PrintTriangle(triangle *tri){
+    printf("a: %f %f %f, b: %f %f %f, c: %f %f %f\n",
+            tri->a.x, tri->a.y, tri->a.z,
+            tri->b.x, tri->b.y, tri->b.z,
+            tri->c.x, tri->c.y, tri->c.z);
+}
+
+void CreateTriangle(triangle *tri, point_3 a, point_3 b, point_3 c){
+    tri->a = a;
+    tri->b = b;
+    tri->c = c;
+    tri->ab = (seg_3){a, b};
+    tri->ac = (seg_3){a, c};
+    tri->bc = (seg_3){b, c};
+}
+
 void CreatePoint(FILE *fp, point_3 *point){
     char *num, *saveptr;
     size_t len;
@@ -30,7 +46,7 @@ void CreatePoint(FILE *fp, point_3 *point){
 
 int main(int argc, char **argv){
     FILE *fp;
-    int num_p;
+    int num_p, num_s, num_t, iter;
     point_3** point_arr;
     seg_3** seg_arr;
     triangle** tri_arr;
@@ -39,14 +55,15 @@ int main(int argc, char **argv){
         exit(-1);
 
     num_p = atoi(argv[1]);
-
     point_arr = malloc(num_p*sizeof(point_3 *));
 
     //Line: nCr(num,2) = num!/(2!*(num-2)!) Or num*num-1/2
-    seg_arr = malloc((factorial(num_p, num_p-2)/2)*sizeof(seg_3 *));
+    num_s = factorial(num_p, num_p-2)/2;
+    seg_arr = malloc(num_s*sizeof(seg_3 *));
 
     //Triangles: nCr(num, 3) = num!/(3!*(num-3)!) or num*num-1*num-2/6
-    tri_arr = malloc((factorial(num_p, num_p-3)/6)*sizeof(triangle *));
+    num_t = factorial(num_p, num_p-3)/6;
+    tri_arr = malloc(num_t*sizeof(triangle *));
 
     fp = fopen(argv[2], "r");
 
@@ -57,6 +74,33 @@ int main(int argc, char **argv){
         printf("%f, %f, %f\n", point_arr[i]->x, point_arr[i]->y, point_arr[i]->z);
     }
 
+    iter = 0;
+    for(int i = 0; i < num_p; i++){
+        for(int j = i+1; j < num_p; j++){
+            seg_arr[iter] = malloc(sizeof(seg_3));
+            seg_arr[iter]->start = *point_arr[i];
+            seg_arr[iter]->end = *point_arr[j];
+
+            iter++;
+        }
+    }
+
+    iter = 0;
+    for(int i = 0; i < num_p; i++){
+        for(int j = i+1; j < num_p; j++){
+            for(int k = j+1; k < num_p; k++){
+                tri_arr[iter] = malloc(sizeof(triangle));
+                CreateTriangle(tri_arr[iter], *point_arr[i], *point_arr[j], *point_arr[k]);
+
+                iter++;
+            }
+        }
+    }
+
+    for(int i = 0; i < num_t; i++){
+        printf("Triangle %d:\n", i);
+        PrintTriangle(tri_arr[i]);
+    }
 
     return 0;
 

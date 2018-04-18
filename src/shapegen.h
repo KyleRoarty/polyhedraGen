@@ -17,6 +17,9 @@ typedef struct {
     point_3 a;
     point_3 b;
     point_3 c;
+    seg_3 ab;
+    seg_3 ac;
+    seg_3 bc;
 } triangle;
 
 #endif
