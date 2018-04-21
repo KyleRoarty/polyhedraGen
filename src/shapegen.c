@@ -4,6 +4,10 @@
 
 #include "shapegen.h"
 
+
+// If cross prod < epsilon, approx parallel
+#define EPSILON .01
+
 void PrintSeg(seg_3 *seg){
     printf("S: %f %f %f E: %f %f %f Sl: %f %f %f\n",
             seg->start->x, seg->start->y, seg->start->z,
@@ -43,7 +47,23 @@ int sum(int from, int to){
     return ret;
 }
 
+float magnitude3(point_3 p){
+    return sqrt(p->x*p->x + p->y*p->y + p->z*p->z);
+}
 
+float dotProduct3(point_3 *p1, point_3 *p2){
+    return p1->x*p2->x + p1->y*p2->y + p1->z*p2->z;
+}
+
+point_3 crossProduct3(point_3 *p1, point_3 *p2){
+    point_3 ret;
+
+    ret.x = p1->y*p2->z - p1->z*p2->y;
+    ret.y = p1->z*p2->x - p1->x*p2->z;
+    ret.z = p1->x*p2->y - p1->y*p2->z;
+
+    return ret;
+}
 // Calculates slope portion of seg_3 struct, puts it into seg->slope
 // Also allocates memory for seg->slope
 void slopeSeg(seg_3 *seg){
